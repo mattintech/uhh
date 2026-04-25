@@ -1,5 +1,11 @@
 # uhh
 
+[![PyPI](https://img.shields.io/pypi/v/uhh.svg)](https://pypi.org/project/uhh/)
+[![Python versions](https://img.shields.io/pypi/pyversions/uhh.svg)](https://pypi.org/project/uhh/)
+[![Status](https://img.shields.io/pypi/status/uhh.svg)](https://pypi.org/project/uhh/)
+[![License](https://img.shields.io/pypi/l/uhh.svg)](LICENSE)
+[![Publish](https://img.shields.io/github/actions/workflow/status/mattintech/uhh/publish.yml?label=publish)](https://github.com/mattintech/uhh/actions/workflows/publish.yml)
+
 > i forgor 💀 — ask your local LLM for the command you forgot, then run it.
 
 `uhh` is a tiny CLI that asks a local [Ollama](https://ollama.com) instance for the command-line answer to a natural-language question, prints it, and optionally runs it. Cross-platform, zero runtime dependencies.
