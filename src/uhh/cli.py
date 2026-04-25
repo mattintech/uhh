@@ -55,6 +55,19 @@ string fields:
   "explanation": one short sentence (<= 100 chars) describing what it does.
   "target_os":   exactly one of "Linux", "macOS", "Windows", or "any" (for portable commands).
 
+target_os rules — be conservative; only set Linux/macOS/Windows when the command genuinely
+won't work elsewhere. Default to "any" whenever:
+  - the question doesn't name a specific OS, AND
+  - the command uses POSIX/cross-Unix tools available on BOTH Linux and macOS — including
+    lsof, ps, kill, grep, awk, sed, find, xargs, cut, sort, uniq, head, tail, tr, wc,
+    curl, wget, ssh, scp, rsync, tar, gzip, du, df, mount, chmod, chown, ln, ls, cp, mv,
+    mkdir, rm, touch, cat, less, env, which, history, date, uname, hostname, ifconfig,
+    netstat, ping, dig, nslookup, openssl, git, make, python, node, etc.
+Only pick "Linux" for genuinely Linux-only things (apt, systemctl, ip, ss, journalctl,
+/proc/*, iptables, etc.). Only pick "macOS" for genuinely macOS-only things (brew, security,
+launchctl, defaults, pmset, caffeinate, osascript, /Library/*, etc.). Only pick "Windows"
+for cmd.exe, PowerShell-only cmdlets, winget, choco, registry edits, etc.
+
 Use SYSTEM FACTS values (ssh keys, hostnames, username, cwd) verbatim — but ONLY when
 target_os matches the user's current machine. For cross-OS answers, use generic placeholders.
 
@@ -356,11 +369,15 @@ def main() -> int:
     if cross_os:
         sys.stdout.flush()
         print(
-            f"\n[uhh] target = {target_os}; you're on {os_name} — won't offer to run here. "
-            f"Copy this to a {target_os} machine.",
+            f"\n[uhh] target = {target_os}; you're on {os_name} — model may be wrong, "
+            f"or this might not work locally.",
             file=sys.stderr,
         )
-        return 0
+        if args.no_run:
+            return 0
+        if not (args.yes or prompt_yes_no("Run anyway? [y/N] ")):
+            return 0
+        return run_command(command, shell_name)
 
     if args.no_run:
         return 0
