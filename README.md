@@ -1,5 +1,11 @@
 # uhh
 
+[![PyPI](https://img.shields.io/pypi/v/uhh.svg)](https://pypi.org/project/uhh/)
+[![Python versions](https://img.shields.io/pypi/pyversions/uhh.svg)](https://pypi.org/project/uhh/)
+[![Status](https://img.shields.io/pypi/status/uhh.svg)](https://pypi.org/project/uhh/)
+[![License](https://img.shields.io/pypi/l/uhh.svg)](LICENSE)
+[![Publish](https://img.shields.io/github/actions/workflow/status/mattintech/uhh/publish.yml?label=publish)](https://github.com/mattintech/uhh/actions/workflows/publish.yml)
+
 > i forgor 💀 — ask your local LLM for the command you forgot, then run it.
 
 `uhh` is a tiny CLI that asks a local [Ollama](https://ollama.com) instance for the command-line answer to a natural-language question, prints it, and optionally runs it. Cross-platform, zero runtime dependencies.
@@ -108,6 +114,40 @@ A small, read-only snapshot of your machine is included in the prompt by default
 - Host alias names from `~/.ssh/config` — never destination hostnames
 
 Nothing is sent to a third party — only to the Ollama instance you configured. Disable entirely with `--no-context`.
+
+## Development
+
+Install the latest unreleased code from the `develop` branch:
+
+```sh
+pip install git+https://github.com/mattintech/uhh.git@develop
+```
+
+Or with pipx:
+
+```sh
+pipx install git+https://github.com/mattintech/uhh.git@develop
+```
+
+Re-install from a different branch (e.g. a feature branch) — `pipx upgrade` won't switch refs, so use `--force`:
+
+```sh
+pipx install --force git+https://github.com/mattintech/uhh.git@feature/pypiready
+```
+
+For pip, add `--force-reinstall`:
+
+```sh
+pip install --force-reinstall git+https://github.com/mattintech/uhh.git@feature/pypiready
+```
+
+Check the installed version anytime with `uhh --version`.
+
+Branches:
+- `main` — tracks released versions; tag a release here to publish to PyPI
+- `develop` — integration branch for in-progress work; install from here to try unreleased changes
+
+Releasing: bump nothing — versions come from git tags via `hatch-vcs`. Merge `develop` → `main`, then GitHub UI → Releases → Draft → tag `vX.Y.Z` → Publish. The `publish.yml` workflow ships it to PyPI.
 
 ## Requirements
 

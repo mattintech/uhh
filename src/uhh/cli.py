@@ -225,10 +225,13 @@ def prompt_yes_no(prompt: str) -> bool:
 
 
 def main() -> int:
+    from . import __version__
+
     p = argparse.ArgumentParser(
         prog="uhh",
         description="Ask a local LLM for the command you forgot, then optionally run it.",
     )
+    p.add_argument("--version", action="version", version=f"uhh {__version__}")
     p.add_argument("question", nargs="*", help="natural-language question")
     p.add_argument("--profile", help="config profile to use")
     p.add_argument("--host", help="Ollama host URL (overrides profile)")
