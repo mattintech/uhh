@@ -109,6 +109,26 @@ A small, read-only snapshot of your machine is included in the prompt by default
 
 Nothing is sent to a third party — only to the Ollama instance you configured. Disable entirely with `--no-context`.
 
+## Development
+
+Install the latest unreleased code from the `develop` branch:
+
+```sh
+pip install git+https://github.com/mattintech/uhh.git@develop
+```
+
+Or with pipx:
+
+```sh
+pipx install git+https://github.com/mattintech/uhh.git@develop
+```
+
+Branches:
+- `main` — tracks released versions; tag a release here to publish to PyPI
+- `develop` — integration branch for in-progress work; install from here to try unreleased changes
+
+Releasing: bump nothing — versions come from git tags via `hatch-vcs`. Merge `develop` → `main`, then GitHub UI → Releases → Draft → tag `vX.Y.Z` → Publish. The `publish.yml` workflow ships it to PyPI.
+
 ## Requirements
 
 - Python 3.11+ (uses stdlib `tomllib`)

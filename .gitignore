@@ -8,6 +8,7 @@ build/
 dist/
 .eggs/
 pip-wheel-metadata/
+src/uhh/_version.py
 
 # Virtual environments
 venv/
