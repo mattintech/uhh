@@ -12,6 +12,7 @@ src/uhh/_version.py
 
 # Virtual environments
 venv/
+venv-*/
 .venv/
 env/
 ENV/

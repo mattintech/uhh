@@ -10,6 +10,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import time
 import tomllib
 import urllib.error
 import urllib.request
@@ -18,6 +19,7 @@ from pathlib import Path
 DEFAULT_HOST = "http://localhost:11434"
 DEFAULT_MODEL = "qwen2.5-coder:14b-instruct-q4_K_M"
 DEFAULT_TIMEOUT = 120
+YES_ABORT_SECONDS = 1.0
 
 DEFAULT_CONFIG = """\
 # uhh config — point at any Ollama instance.
@@ -139,7 +141,7 @@ def load_config() -> dict:
     path = config_path()
     if not path.exists():
         if sys.stdin.isatty() and sys.stdout.isatty():
-            from .setup import run_wizard
+            from .wizard import run_wizard
             run_wizard(path)
         else:
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -309,6 +311,18 @@ def main() -> int:
 
     if args.no_run:
         return 0
-    if args.yes or prompt_yes_no("\nRun it? [y/N] "):
+    if args.yes:
+        if sys.stdin.isatty():
+            try:
+                print(
+                    f"\n[uhh] running in {YES_ABORT_SECONDS:.0f}s — Ctrl-C to abort.",
+                    file=sys.stderr,
+                )
+                time.sleep(YES_ABORT_SECONDS)
+            except KeyboardInterrupt:
+                print("\n[uhh] aborted.", file=sys.stderr)
+                return 130
+        return run_command(command, shell_name)
+    if prompt_yes_no("\nRun it? [y/N] "):
         return run_command(command, shell_name)
     return 0

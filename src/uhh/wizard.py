@@ -9,6 +9,8 @@ from pathlib import Path
 
 DEFAULT_HOST = "http://localhost:11434"
 
+_RM_CMD = "del" if sys.platform == "win32" else "rm"
+
 # Curated picks for command-lookup use case. Order = preference.
 RECOMMENDED_MODELS = [
     # (model_name, approx_size, blurb)
@@ -195,4 +197,4 @@ def run_wizard(config_target: Path) -> None:
 
     print(f"\n  ✓ wrote config to {config_target}")
     print(f"  ✓ default profile 'local' → {model} @ {host}")
-    print("\nSetup complete. Re-run with `rm {} && uhh ...` to redo setup.\n".format(config_target))
+    print(f"\nSetup complete. Re-run with `{_RM_CMD} {config_target} && uhh ...` to redo setup.\n")
