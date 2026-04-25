@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "uhh"
+version = "0.1.0"
+description = "Ask a local LLM (Ollama) for the command you forgot, then optionally run it."
+requires-python = ">=3.11"
+authors = [{ name = "Matt Hills", email = "mattintech@gmail.com" }]
+license = "MIT"
+keywords = ["cli", "ollama", "llm", "command-line", "shell", "ai", "assistant"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: System Administrators",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Utilities",
+]
+dependencies = []
+
+[project.scripts]
+uhh = "uhh.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/mattintech/uhh"
+Repository = "https://github.com/mattintech/uhh"
+Issues = "https://github.com/mattintech/uhh/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/uhh"]
