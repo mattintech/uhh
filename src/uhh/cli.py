@@ -276,9 +276,17 @@ def main() -> int:
     p = argparse.ArgumentParser(
         prog="uhh",
         description="Ask a local LLM for the command you forgot, then optionally run it.",
+        epilog=(
+            "tip: quote questions with apostrophes — your shell eats unmatched ' "
+            "characters. Use double quotes (\"don't sleep\") or rewrite (\"do not sleep\")."
+        ),
     )
     p.add_argument("--version", action="version", version=f"uhh {__version__}")
-    p.add_argument("question", nargs="*", help="natural-language question")
+    p.add_argument(
+        "question",
+        nargs="*",
+        help='natural-language question (quote it if it contains apostrophes, e.g. "don\'t")',
+    )
     p.add_argument("--profile", help="config profile to use")
     p.add_argument("--host", help="Ollama host URL (overrides profile)")
     p.add_argument("--model", help="model name (overrides profile)")

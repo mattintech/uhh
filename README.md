@@ -25,6 +25,23 @@ It reads safe local context — your username, hostname, current directory, name
 
 If you ask about a different OS than your current one (e.g. you're on Linux but ask "how do I unlock the keychain on mac"), `uhh` produces the right command but skips the run prompt for safety.
 
+## Quoting your question
+
+`uhh` reads your question from `argv`, so your shell parses it before `uhh` ever sees it. Two characters will trip you up if left bare:
+
+- **Apostrophes** (`'`) — `uhh how do I keep my mac from sleeping when I don't want it to` will leave your shell sitting on a continuation prompt waiting for the closing `'`. Wrap the question in double quotes, escape the apostrophe, or just rewrite without the contraction.
+- **Shell metacharacters** (`|`, `>`, `<`, `&`, `;`, `$`, backticks) — these get interpreted by the shell. Quote the question if you're including any of them.
+
+```sh
+# bad — shell hangs on the apostrophe:
+uhh how do I stop my mac sleeping when I don't want it to
+
+# good — any of these works:
+uhh "how do I stop my mac sleeping when I don't want it to"
+uhh how do I stop my mac sleeping when I don\'t want it to
+uhh how do I stop my mac sleeping when I do not want it to
+```
+
 ## Install
 
 ```sh
