@@ -10,6 +10,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import threading
 import time
 import tomllib
 import urllib.error
@@ -173,6 +174,49 @@ def detect_shell(override: str | None) -> tuple[str, str]:
     return Path(os.environ.get("SHELL", "/bin/sh")).name, os_name
 
 
+class _Thinking:
+    """Animated 'thinking' indicator on stderr; static line on non-TTY."""
+
+    FRAMES = ("thinking   ", "thinking.  ", "thinking.. ", "thinking...")
+    INTERVAL = 0.4
+
+    def __init__(self, stream=sys.stderr):
+        self.stream = stream
+        self._stop = threading.Event()
+        self._thread: threading.Thread | None = None
+        self._tty = bool(getattr(stream, "isatty", lambda: False)())
+
+    def __enter__(self):
+        if not self._tty:
+            self.stream.write("[uhh] thinking...\n")
+            self.stream.flush()
+            return self
+        self.stream.write("\x1b[?25l")  # hide cursor
+        self.stream.flush()
+        self._thread = threading.Thread(target=self._spin, daemon=True)
+        self._thread.start()
+        return self
+
+    def __exit__(self, *exc):
+        if not self._tty:
+            return False
+        self._stop.set()
+        if self._thread:
+            self._thread.join()
+        # Clear the line and restore cursor.
+        self.stream.write("\r" + " " * (len(self.FRAMES[-1]) + 8) + "\r\x1b[?25h")
+        self.stream.flush()
+        return False
+
+    def _spin(self) -> None:
+        i = 0
+        while not self._stop.is_set():
+            self.stream.write("\r[uhh] " + self.FRAMES[i % len(self.FRAMES)])
+            self.stream.flush()
+            i += 1
+            self._stop.wait(self.INTERVAL)
+
+
 def ask_ollama(host: str, model: str, system: str, user: str,
                api_key: str | None, timeout: int) -> dict:
     body = json.dumps({
@@ -286,7 +330,8 @@ def main() -> int:
 
     question = " ".join(args.question)
 
-    result = ask_ollama(host, model, system, question, api_key, args.timeout)
+    with _Thinking():
+        result = ask_ollama(host, model, system, question, api_key, args.timeout)
     command = (result.get("command") or "").strip()
     explanation = (result.get("explanation") or "").strip()
     target_os = (result.get("target_os") or "").strip()
