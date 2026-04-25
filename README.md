@@ -123,6 +123,20 @@ Or with pipx:
 pipx install git+https://github.com/mattintech/uhh.git@develop
 ```
 
+Re-install from a different branch (e.g. a feature branch) — `pipx upgrade` won't switch refs, so use `--force`:
+
+```sh
+pipx install --force git+https://github.com/mattintech/uhh.git@feature/pypiready
+```
+
+For pip, add `--force-reinstall`:
+
+```sh
+pip install --force-reinstall git+https://github.com/mattintech/uhh.git@feature/pypiready
+```
+
+Check the installed version anytime with `uhh --version`.
+
 Branches:
 - `main` — tracks released versions; tag a release here to publish to PyPI
 - `develop` — integration branch for in-progress work; install from here to try unreleased changes
