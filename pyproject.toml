@@ -6,6 +6,7 @@ build-backend = "hatchling.build"
 name = "uhh"
 dynamic = ["version"]
 description = "Ask a local LLM (Ollama) for the command you forgot, then optionally run it."
+readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "Matt Hills", email = "mattintech@gmail.com" }]
 license = "MIT"
