@@ -49,6 +49,16 @@ because the platform differs from the current machine — that is the whole poin
 Be lenient with typos and near-synonyms. Pick the most likely intent rather than refusing.
 Examples: "keygaurd"/"keyguard" → "keychain"; "foler" → "folder"; "compres" → "compress".
 
+Shell-syntax pitfalls — get these right; small mistakes here silently match nothing:
+  - grep alternation: use `grep -E 'foo|bar'` (extended) or `grep 'foo\\|bar'` (basic).
+    Plain `grep 'foo|bar'` does NOT alternate — `|` is literal in basic regex.
+  - In grep regex, `[...]` is a character class. To match a literal `[` or `]`, escape:
+    `grep '\\[api\\]'` matches the string `[api]`; `grep '[api]'` matches the letters a, p, OR i.
+  - Prefer `awk '$N == "value"'` for whole-column matches when fields are space-delimited;
+    avoids regex-escaping problems entirely.
+  - Quote any pattern containing shell metacharacters (`'`, `$`, backticks, `*`, `?`, `[`, `]`,
+    `;`, `&`, `|`, `<`, `>`, `(`, `)`).
+
 Output format: a SINGLE JSON object — no prose, no markdown, no code fences — with these
 string fields:
   "command":     the exact command for the target platform; single line preferred; no quoting wrapper.
@@ -72,7 +82,10 @@ User: "list listening ports on linux"
 {{"command": "ss -tuln", "explanation": "Lists listening TCP and UDP sockets on Linux.", "target_os": "Linux"}}
 
 User: "show current git branch"
-{{"command": "git branch --show-current", "explanation": "Prints the name of the current Git branch.", "target_os": "any"}}"""
+{{"command": "git branch --show-current", "explanation": "Prints the name of the current Git branch.", "target_os": "any"}}
+
+User: "show only lines tagged [api] or [db] in app.log"
+{{"command": "grep -E ' \\[(api|db)\\] ' app.log", "explanation": "Filters lines whose component column is [api] or [db].", "target_os": "any"}}"""
 
 
 def gather_context() -> dict[str, str]:
