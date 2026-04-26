@@ -15,8 +15,8 @@
 ## Demo
 
 ```sh
-$ uhh how do i scp test.txt to mhills@172.16.0.1
-$ scp test.txt mhills@172.16.0.1:~/
+$ uhh how do i scp test.txt to user@172.16.0.1
+$ scp test.txt user@172.16.0.1:~/
   # Copies test.txt to the remote host's home directory.
 
 Run it? [y/N] y
@@ -45,6 +45,18 @@ uhh how do I stop my mac sleeping when I do not want it to
 ```
 
 ## Install
+
+One command — installs Ollama (if missing), a small model, and `uhh`:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/mattintech/uhh/main/install.sh | sh
+```
+
+Supports macOS and Linux. Idempotent — safe to re-run; existing Ollama installs and pulled models are detected and skipped. The default model is `llama3.2:3b` (~2 GB); override with `UHH_INSTALL_MODEL=...` if you want something else.
+
+### Manual install
+
+If you'd rather install the pieces yourself:
 
 ```sh
 pip install uhh
