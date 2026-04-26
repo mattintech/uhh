@@ -10,6 +10,8 @@
 
 `uhh` is a tiny CLI that asks a local [Ollama](https://ollama.com) instance for the command-line answer to a natural-language question, prints it, and optionally runs it. Cross-platform, zero runtime dependencies.
 
+> **Heads up — Windows is unverified.** `uhh` is written to work on Windows (PowerShell / cmd detection, `%APPDATA%` config path, etc.) but I no longer have a Windows machine to test on. If you run `uhh` on Windows and something is broken, please [open an issue](https://github.com/mattintech/uhh/issues/new?template=bug_report.yml) — and if you'd like to help validate releases on Windows, please reach out via an issue or discussion. Linux and macOS are tested.
+
 ## Demo
 
 ```sh
