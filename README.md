@@ -172,6 +172,16 @@ Releasing: bump nothing — versions come from git tags via `hatch-vcs`. Merge `
 - [Ollama](https://ollama.com) reachable locally or remotely
 - A chat-tuned model (the wizard helps install one)
 
+## Reporting bugs
+
+Run `uhh --bug` and your browser will open a pre-filled GitHub issue form with your `uhh` version, OS, Python version, shell, model, and a localhost-vs-remote indicator for your Ollama host. Add what you ran, what you expected, and what you got — then submit. (No GitHub auth happens from `uhh`; it just opens the URL.)
+
+You can also pass the prompt that broke to pre-fill the "what you ran" field:
+
+```sh
+uhh --bug "show me lines tagged [api] in app.log"
+```
+
 ## License
 
 [MIT](LICENSE)

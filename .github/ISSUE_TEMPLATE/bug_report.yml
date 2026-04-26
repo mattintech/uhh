@@ -1,0 +1,100 @@
+name: Bug report
+description: Report something uhh got wrong (bad command, crash, hang, etc.)
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug! The fields below let me reproduce what you saw.
+        Tip: `uhh --bug` opens this form pre-filled with your environment.
+
+  - type: input
+    id: version
+    attributes:
+      label: uhh version
+      description: Output of `uhh --version`
+      placeholder: "uhh 0.1.2"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      description: e.g. macOS 14.5, Ubuntu 24.04, Windows 11
+    validations:
+      required: true
+
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      description: Output of `python --version`
+      placeholder: "Python 3.12.5"
+    validations:
+      required: true
+
+  - type: input
+    id: shell
+    attributes:
+      label: Shell
+      description: e.g. zsh, bash, fish, PowerShell
+    validations:
+      required: true
+
+  - type: input
+    id: model
+    attributes:
+      label: Ollama model
+      description: The model `uhh` is using (from `~/.config/uhh/config.toml` or `--model`)
+      placeholder: "qwen2.5-coder:14b-instruct-q4_K_M"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: host
+    attributes:
+      label: Ollama host
+      description: Where is Ollama running? (Helps me tell local vs. remote bugs apart.)
+      options:
+        - localhost / 127.0.0.1
+        - remote (LAN / VPN / cloud)
+    validations:
+      required: true
+
+  - type: textarea
+    id: prompt
+    attributes:
+      label: The exact prompt you ran
+      description: Paste the full `uhh ...` command line.
+      render: shell
+      placeholder: 'uhh "show me lines tagged [api] in app.log"'
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect uhh to produce?
+      placeholder: A grep that filters lines whose component column is [api].
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What did uhh actually produce?
+      description: Paste the suggested command and any explanation `uhh` printed.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else?
+      description: |
+        Logs, screenshots, things you tried, related issues — all welcome.
+        If the bug is reproducible, the output of `uhh --show-context "<your prompt>"`
+        is gold.

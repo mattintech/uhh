@@ -5,6 +5,7 @@ import io
 import json
 import sys
 import unittest
+import urllib.parse
 from contextlib import contextmanager
 from pathlib import Path
 from unittest import mock
@@ -137,6 +138,71 @@ class WizardPlatformTests(unittest.TestCase):
 
         expected = "del" if sys.platform == "win32" else "rm"
         self.assertEqual(wizard._RM_CMD, expected)
+
+
+class ClassifyHostTests(unittest.TestCase):
+    def test_localhost_variants(self):
+        for h in (
+            "http://localhost:11434",
+            "http://127.0.0.1:11434",
+            "http://0.0.0.0:11434",
+            "http://[::1]:11434",
+        ):
+            self.assertEqual(cli.classify_host(h), "localhost / 127.0.0.1", h)
+
+    def test_remote_hosts(self):
+        for h in (
+            "http://homelab.lan:11434",
+            "https://ollama.example.com",
+            "http://10.0.0.42:11434",
+            "http://my-server",
+        ):
+            self.assertEqual(cli.classify_host(h), "remote (LAN / VPN / cloud)", h)
+
+    def test_garbage_input_falls_back_to_remote(self):
+        self.assertEqual(cli.classify_host(""), "remote (LAN / VPN / cloud)")
+        self.assertEqual(cli.classify_host("not a url"), "remote (LAN / VPN / cloud)")
+
+
+class BuildBugReportUrlTests(unittest.TestCase):
+    def test_url_starts_with_issue_endpoint_and_template(self):
+        url = cli.build_bug_report_url(
+            "0.1.2", "http://localhost:11434", "qwen3:14b", "zsh", "macOS", None
+        )
+        self.assertTrue(url.startswith(cli.BUG_REPORT_URL + "?"))
+        self.assertIn("template=bug_report.yml", url)
+
+    def test_includes_environment_fields(self):
+        url = cli.build_bug_report_url(
+            "0.1.2", "http://localhost:11434", "qwen3:14b", "zsh", "macOS", None
+        )
+        qs = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+        self.assertEqual(qs["version"], ["uhh 0.1.2"])
+        self.assertEqual(qs["shell"], ["zsh"])
+        self.assertEqual(qs["model"], ["qwen3:14b"])
+        self.assertEqual(qs["host"], ["localhost / 127.0.0.1"])
+
+    def test_remote_host_redacted(self):
+        url = cli.build_bug_report_url(
+            "0.1.2", "http://homelab.lan:11434", "m", "zsh", "macOS", None
+        )
+        self.assertIn("homelab", "homelab.lan")  # sanity
+        self.assertNotIn("homelab", url)
+        self.assertIn("remote", url)
+
+    def test_prompt_included_when_provided(self):
+        url = cli.build_bug_report_url(
+            "0.1.2", "http://localhost", "m", "zsh", "macOS", "list ports"
+        )
+        qs = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+        self.assertEqual(qs["prompt"], ['uhh "list ports"'])
+
+    def test_prompt_omitted_when_none(self):
+        url = cli.build_bug_report_url(
+            "0.1.2", "http://localhost", "m", "zsh", "macOS", None
+        )
+        qs = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+        self.assertNotIn("prompt", qs)
 
 
 if __name__ == "__main__":

@@ -14,13 +14,17 @@ import threading
 import time
 import tomllib
 import urllib.error
+import urllib.parse
 import urllib.request
+import webbrowser
 from pathlib import Path
 
 DEFAULT_HOST = "http://localhost:11434"
 DEFAULT_MODEL = "qwen2.5-coder:14b-instruct-q4_K_M"
 DEFAULT_TIMEOUT = 120
 YES_ABORT_SECONDS = 1.0
+BUG_REPORT_URL = "https://github.com/mattintech/uhh/issues/new"
+LOCAL_HOSTS = ("localhost", "127.0.0.1", "::1", "0.0.0.0")
 
 DEFAULT_CONFIG = """\
 # uhh config — point at any Ollama instance.
@@ -283,6 +287,44 @@ def prompt_yes_no(prompt: str) -> bool:
     return ans in ("y", "yes")
 
 
+def classify_host(host: str) -> str:
+    """Localhost vs. remote — never expose a private hostname in a public bug report."""
+    try:
+        netloc = urllib.parse.urlparse(host).hostname or ""
+    except ValueError:
+        netloc = ""
+    return "localhost / 127.0.0.1" if netloc.lower() in LOCAL_HOSTS else "remote (LAN / VPN / cloud)"
+
+
+def build_bug_report_url(version: str, host: str, model: str, shell: str,
+                         os_name: str, prompt: str | None) -> str:
+    """Pre-fill the bug-report issue form with safe environment info."""
+    fields = {
+        "template": "bug_report.yml",
+        "version": f"uhh {version}",
+        "os": f"{os_name} {platform.release()}".strip(),
+        "python": f"Python {platform.python_version()}",
+        "shell": shell,
+        "model": model,
+        "host": classify_host(host),
+    }
+    if prompt:
+        fields["prompt"] = f'uhh "{prompt}"'
+    return BUG_REPORT_URL + "?" + urllib.parse.urlencode(fields)
+
+
+def open_bug_report(version: str, host: str, model: str, shell: str,
+                    os_name: str, prompt: str | None) -> int:
+    url = build_bug_report_url(version, host, model, shell, os_name, prompt)
+    print("[uhh] opening bug report in your browser. If it doesn't open, paste this URL:")
+    print(url)
+    try:
+        webbrowser.open(url)
+    except webbrowser.Error:
+        pass
+    return 0
+
+
 def main() -> int:
     from . import __version__
 
@@ -311,11 +353,25 @@ def main() -> int:
     p.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT, help="request timeout in seconds")
     p.add_argument("--config", action="store_true", help="print config path and exit")
     p.add_argument("--list-profiles", action="store_true", help="list configured profiles")
+    p.add_argument(
+        "--bug",
+        action="store_true",
+        help="open a pre-filled GitHub bug-report form in your browser",
+    )
     args = p.parse_args()
 
     if args.config:
         print(config_path())
         return 0
+
+    if args.bug:
+        cfg = load_config() if config_path().exists() else {}
+        profile = resolve_profile(cfg, args.profile) if cfg else {}
+        host = args.host or os.environ.get("UHH_HOST") or profile.get("host", DEFAULT_HOST)
+        model = args.model or os.environ.get("UHH_MODEL") or profile.get("model", DEFAULT_MODEL)
+        shell_name, os_name = detect_shell(args.shell or profile.get("shell"))
+        prompt = " ".join(args.question) if args.question else None
+        return open_bug_report(__version__, host, model, shell_name, os_name, prompt)
 
     first_run = not config_path().exists()
     cfg = load_config()
